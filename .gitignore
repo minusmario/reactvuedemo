@@ -1,0 +1,16 @@
+HELP.md
+/target/
+/.mvn
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### Front End ###
+node_modules/
+
+### Maven ###
+/mvnw
+/mvnw.cmd
