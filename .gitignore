@@ -14,3 +14,7 @@ node_modules/
 ### Maven ###
 /mvnw
 /mvnw.cmd
+
+
+### Yarn ###
+yarn-debug.log*
