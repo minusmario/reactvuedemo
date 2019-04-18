@@ -115,5 +115,60 @@ React & Vue 比较示例
       打开./src/views/Home.vue，可以看到组件内包括了一个img元素和一个名为HelloWorld的子组件，同时传递了一个名为msg的属性给它，打开./src/components/HelloWorld.vue，可以看到父组件传递过来的属性是如何被嵌入模板的。在Home组件中，删除对HelloWorld的调用，主页即只剩下Home组件中的img元素。
       
 2. #### 路由
-    Vue的路由为官方插件，与项目结合成本较低，脚手架也提供了足够好的自动集成（[官网](https://router.vuejs.org/)）
-    React的路由管理则普遍采用社区维护的
+    1. Vue的路由为官方插件，与项目结合成本较低，脚手架也提供了足够好的自动集成（[官网](https://router.vuejs.org/)）  
+    2. React的路由管理则普遍采用社区维护的react router，中文文档较少且文档较vue router更加晦涩一些。
+    
+    在reactdemo中运行```npm i react-router-dom```，安装react router。在./src/components下新建一个名为Demo的组件：
+    ```JavaScript
+    import React, { Component } from 'react';
+
+    class Demo extends Component {
+      render() {
+        return (
+          <div>这是一个子组件</div>
+        );
+      }
+    }
+
+    export default Demo;
+    ```
+    并且在App.js中引入，react router和Demo.js。然后按照react router的教程加入```<Router>```和```<Route>```组件：
+    ```javascript
+    class App extends Component {
+      render() {
+        return (
+          <div className="App">
+            <Router>
+              <div>
+                <nav>
+                  <ul>
+                    <li>
+                      <Link to="/">To Home</Link>
+                    </li>
+                    <li>
+                      <Link to="/demo/">To Demo</Link>
+                    </li>
+                  </ul>
+                </nav>
+                <Route path="/" exact component={Home}/>
+                <Route path="/demo/" component={Demo}/>
+              </div>
+            </Router>
+          </div>
+        );
+      }
+    }
+
+    function Home() {
+      return (
+        <header className="App-header">
+          <img src={logo} className="App-logo" alt="logo"/>
+        </header>
+      );
+    }
+
+    export default App;
+
+    ```
+    （为了将```<Router>```作为根元素，将原来App.js的组件移至```Home()```方法中，此处不继续深究）
+    可以看到，在浏览器里已经有了导航列表，点击相应的连接会被跳转至相应的路由，浏览器地址栏亦做出了相应。
