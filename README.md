@@ -92,7 +92,7 @@ React & Vue 比较示例
     项目新建之后打开相应的地址即可看到一个带有框架Logo和简单说明的页面，现去掉除Logo之外的内容，由于一个采用了JSX，另一个使用了模板，所以两者的可读性都非常强，更改十分简单明了：
     - React：  
       去掉App.js中p标签和a标签的内容即可：
-      ```
+      ```HTML
           <p>
             Edit <code>src/App.js</code> and save to reload.
           </p>
@@ -107,9 +107,13 @@ React & Vue 比较示例
       ```
     - Vue
       由于刚才的安装以及集成了官方的路由库，所以vue的路由开箱即用，在App.vue中可以看到：
-      ```
+      ```HTML
       <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link>
       ```
       代码很简单也很好理解，即主页App.vue里包含两个路由，每个路由分别指向了一个URL，打开./src/router.js，可以看到每个URL对应的需要渲染的组件，分别为./src/views中的Home.vue和About.vue。
       打开./src/views/Home.vue，可以看到组件内包括了一个img元素和一个名为HelloWorld的子组件，同时传递了一个名为msg的属性给它，打开./src/components/HelloWorld.vue，可以看到父组件传递过来的属性是如何被嵌入模板的。在Home组件中，删除对HelloWorld的调用，主页即只剩下Home组件中的img元素。
+      
+2. #### 路由
+    Vue的路由为官方插件，与项目结合成本较低，脚手架也提供了足够好的自动集成（[官网](https://router.vuejs.org/)）
+    React的路由管理则普遍采用社区维护的
