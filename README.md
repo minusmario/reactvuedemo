@@ -186,3 +186,12 @@ React & Vue 比较示例
 4. #### 异步请求&列表渲染
     - Vue  
       Vuex提供了Mutation和Action两种更改状态的方式，并且明确推荐异步操作使用Action，只需在Action中发送异步请求，并且在回调函数中使用参数中的commit来触发一个Mutation即可，思路较为清晰。这里使用较为流行的异步库axios，同时，项目后台在8081端口提供了一个```/example```接口，固定返回一个长度为10的列表数据。这里之前提到过的开发代理就会派上用场，即开发服务器会将所有除静态文件之外的请求进行转发，省去了前台频繁的部署。vue-cli提供了相应的配置接口，在vue项目跟目录新建一个vue.config.js文件，按照文档配置devServer的proxy属性即可。启动前台开发服务器&后台接口之后，点击“点击此处获取列表数据”按钮之后，可以看到从服务器取回的数据在前台进行了渲染，Vue对于列表的渲染有专门的指令```v-for```,具体代码可以参见“Vue异步请求&列表渲染”的提交。
+    - React  
+      React对于异步状态修改的处理相较Vue更加重视，Redux提供了一个中间件```applyMiddleware()```接口，用以包装actions，可用的中间件有：
+      - redux-thunk
+      - redux-promise
+      - redux-observable
+      - redux-saga等  
+      而其中的redux-observable则结合了响应式编程/观察者模式，封装后的action（此处被称为epic）在处理复杂的异步请求时显得游刃有余。具体的使用稍微你有些复杂，参见“React异步请求&列表渲染”提交，可以看到，在将redux-observable嵌入项目之后，所有的action均被挟持为Observable，并被Epic接管，继而Observable中提供的丰富的Operator均可以被调用，epic.js中使用了debounceTime操作符，可以从页面的“当前状态"一行中看到用户点击相应按钮和实际发送请求之间的时间关系，这对以处理复杂的异步场景明显是威力巨大的。
+      列表渲染方面，主要逻辑在Demo.js中，可以看到React处理列表时对JSX表达式和Array.prototype.map函数的结合，也是十分简洁的。
+      
