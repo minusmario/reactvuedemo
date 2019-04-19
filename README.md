@@ -178,4 +178,5 @@ React & Vue 比较示例
     - Vue  
       Vue组件中的data属性会在初始化时被Vue全部转化为getter和setter，往后任何对data属性的直接操作都会触发DOM更新。但是当Vue与其状态管理库Vuex结合使用时，直接更改组件的状态变得不再可取，必须通过相应的Action触发state的状态更改，此时需要用到Vue的计算属性。具体代码见“Vue用户输入绑定&监听”的提交中About.vue和store.js中的更改。从代码可以看出，稍加理解之后，Vue处理用户交互以及对交互数据进行统一的状态管理还是很直白的，代码量也不大。
     - React  
-    
+      由于create-react-app并未自带Redux，所以我们先实现没有Redux参与的用户交互，参见“React用户输入绑定&监听 without redux”的commit中Demo.js的改动，可以看到，由于没有了Vue中对data属性的处理，React中使用了```setState```方法对视图或者数据的变化进行重新渲染，这也是两者一个比较显著的区别。另外，监听回调函数的作用域也是React相较Vue需要更加小心的地方。  
+      在引入Redux之后，事情变得复杂了一些，首先，Demo组件不再自己持有状态（state），而是转交到Redux管理的store处理，store由reducer创建，而reducer则封装了状态的处理逻辑。实现的细节在此不做深究，但是Redux的整体思想就是将原先需要组件自身管理的一些数据和逻辑交由Redux管理，自身则变为一个单纯接收属性以及发送actions的“单向”组件。具体代码请见“React用户输入绑定&监听 with redux”的提交。
