@@ -192,7 +192,7 @@ React & Vue 比较示例
       - redux-promise
       - redux-observable
       - redux-saga等  
-      而其中的redux-observable则结合了响应式编程/观察者模式，封装后的action（此处被称为epic）在处理复杂的异步请求时显得游刃有余。具体的使用稍微你有些复杂，参见“React异步请求&列表渲染”提交，可以看到，在将redux-observable嵌入项目之后，所有的action均被挟持为Observable，并被Epic接管，继而Observable中提供的丰富的Operator均可以被调用，epic.js中使用了debounceTime操作符，可以从页面的“当前状态"一行中看到用户点击相应按钮和实际发送请求之间的时间关系，这对以处理复杂的异步场景明显是威力巨大的。
+      而其中的redux-observable则结合了响应式编程/观察者模式，封装后的action（此处被称为epic）在处理复杂的异步请求时显得游刃有余。具体的使用稍微有些复杂，参见“React异步请求&列表渲染”提交，可以看到，在将redux-observable嵌入项目之后，所有的action均被挟持为Observable，并被Epic接管，继而Observable中提供的丰富的Operator均可以被调用，epic.js中使用了debounceTime操作符，可以从页面的“当前状态"一行中看到用户点击相应按钮和实际发送请求之间的时间关系，这对以处理复杂的异步场景明显是威力巨大的。
       列表渲染方面，主要逻辑在Demo.js中，可以看到React处理列表时对JSX表达式和Array.prototype.map函数的结合，也是十分简洁的。
       
 ## 总结
