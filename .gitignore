@@ -10,8 +10,7 @@ HELP.md
 
 ### Front End ###
 node_modules/
-build/
-dist/
+/src/main/resources/static/vue/
 
 ### Maven ###
 /mvnw

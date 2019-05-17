@@ -22,14 +22,16 @@
 
 ### 利用maven插件  
 
-  maven提供了名为[frontend-maven-plugin](https://github.com/eirslett/frontend-maven-plugin)的依赖，用以将前台的构建集成在maven的打包过程中。以本项目的vue为例：
-  1. 修改POM.xml添加依赖：
-  ```XML
-  <!-- https://mvnrepository.com/artifact/com.github.eirslett/frontend-maven-plugin -->
-<dependency>
-    <groupId>com.github.eirslett</groupId>
-    <artifactId>frontend-maven-plugin</artifactId>
-    <version>1.7.6</version>
-</dependency>
-  ```
-  2. 
+  maven提供了名为[frontend-maven-plugin](https://github.com/eirslett/frontend-maven-plugin)的插件，用以将前台的构建集成在maven的打包过程中。以本项目的vue为例：
+  1. 修改POM.xml添加依赖
+  2. 配置插件安装Node、npm/yarn的路径```installDirectory```
+  3. 配置插件运行前台构建命令的工作路径```workingDirectory```
+  4. 配置Node（Npm）/Yarn安装命令
+  5. 配置前台构建命令
+  6. 运行maven构建过程，此时前台构建输出无需再进行手工维护，与后台过程解耦。解压maven输出的war包可以看到前台代码已经被部署。  
+
+具体代码配置见提交frontend maven plugin。  
+这个思路的问题在于Npm/Yarn与Maven对于错误/警告的侦测不同，有可能导致Npm/Yarn命令没有执行成功而maven却继续构建的情况，想要避免可能还需要从TFS配置方面入手。亦或者指定较为严格的开发流程，让开发人员在提交代码前检查错误（前台的开发环境提供动态的错误检测机制）。
+
+### 利用TFS
+这个方法的思路与之前讨论的并没有不同，就是在管道中maven打包之前先运行前台构建脚本，然后将输出文件拷贝至指定位置后再进行maven打包。
