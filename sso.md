@@ -34,4 +34,4 @@ vue开发流程 & 单点登录处理
 - ### JWT（Json Web Token）
     1. 与CAS不同的地方为服务器无状态，不需要保存session
     2. 大致原理即每次请求将JWT信息封装于http header中，后台进行验证
-    3. 如需实现跨域则需要类似iframe之类的trick
+    3. 如需实现跨域则需与CAS一样单独设置登录服务器（假如不设置的话则需要iframe之类的trick）
