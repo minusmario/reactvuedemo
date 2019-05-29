@@ -1,0 +1,417 @@
+{
+  "elements": [
+    {
+      "completed": true,
+      "current": false,
+      "id": "startEvent",
+      "name": "开始",
+      "x": 160.0,
+      "y": 182.0,
+      "width": 30.0,
+      "height": 30.0,
+      "type": "StartEvent",
+      "properties": []
+    },
+    {
+      "completed": false,
+      "current": true,
+      "id": "submitForm",
+      "name": "填写审批信息",
+      "x": 240.0,
+      "y": 169.5,
+      "width": 105.0,
+      "height": 55.0,
+      "type": "UserTask",
+      "properties": [
+        {
+          "name": "Assignee",
+          "value": "wangpan"
+        },
+        {
+          "name": "Form key",
+          "value": "f1"
+        },
+        {
+          "name": "Form properties",
+          "type": "list",
+          "value": [
+            "申请信息 - string (required)",
+            "申请人姓名 - string (required)",
+            "提交时间 - date (required)",
+            "确认申请 - string (required)"
+          ]
+        }
+      ]
+    },
+    {
+      "completed": false,
+      "current": false,
+      "id": "decideSubmit",
+      "name": "提交OR取消",
+      "x": 390.0,
+      "y": 177.0,
+      "width": 40.0,
+      "height": 40.0,
+      "type": "ExclusiveGateway"
+    },
+    {
+      "completed": false,
+      "current": false,
+      "id": "tl_approve",
+      "name": "主管审批",
+      "x": 475.0,
+      "y": 169.5,
+      "width": 105.0,
+      "height": 55.0,
+      "type": "UserTask",
+      "properties": [
+        {
+          "name": "Assignee",
+          "value": "zhumeng"
+        },
+        {
+          "name": "Form key",
+          "value": "tlf1"
+        },
+        {
+          "name": "Form properties",
+          "type": "list",
+          "value": [
+            "主管审批结果 - string (not required)",
+            "主管备注 - string (required)"
+          ]
+        }
+      ]
+    },
+    {
+      "completed": false,
+      "current": false,
+      "id": "decideTLApprove",
+      "name": "主管审批校验",
+      "x": 625.0,
+      "y": 177.0,
+      "width": 40.0,
+      "height": 40.0,
+      "type": "ExclusiveGateway"
+    },
+    {
+      "completed": false,
+      "current": false,
+      "id": "hr_approve",
+      "name": "人事审批",
+      "x": 710.0,
+      "y": 169.5,
+      "width": 105.0,
+      "height": 55.0,
+      "type": "UserTask",
+      "properties": [
+        {
+          "name": "Assignee",
+          "value": "wangpan"
+        },
+        {
+          "name": "Form key",
+          "value": "tlf1"
+        },
+        {
+          "name": "Form properties",
+          "type": "list",
+          "value": [
+            "人事审批结果 - string (required)",
+            "人事审批备注 - string (required)"
+          ]
+        }
+      ]
+    },
+    {
+      "completed": false,
+      "current": false,
+      "id": "decideHRApprove",
+      "name": "人事审批校验",
+      "x": 860.0,
+      "y": 177.0,
+      "width": 40.0,
+      "height": 40.0,
+      "type": "ExclusiveGateway"
+    },
+    {
+      "completed": false,
+      "current": false,
+      "id": "endEvent",
+      "name": "结束",
+      "x": 945.0,
+      "y": 183.0,
+      "width": 28.0,
+      "height": 28.0,
+      "type": "EndEvent",
+      "properties": []
+    },
+    {
+      "completed": false,
+      "current": false,
+      "id": "endEventCancel",
+      "name": "取消",
+      "x": 510.0,
+      "y": 250.0,
+      "width": 28.0,
+      "height": 28.0,
+      "type": "EndEvent",
+      "properties": []
+    }
+  ],
+  "flows": [
+    {
+      "completed": true,
+      "current": false,
+      "id": "flow1",
+      "type": "sequenceFlow",
+      "sourceRef": "startEvent",
+      "targetRef": "submitForm",
+      "waypoints": [
+        {
+          "x": 190.0,
+          "y": 197.0
+        },
+        {
+          "x": 240.0,
+          "y": 197.0
+        }
+      ],
+      "properties": []
+    },
+    {
+      "completed": false,
+      "current": false,
+      "id": "flow2",
+      "type": "sequenceFlow",
+      "sourceRef": "submitForm",
+      "targetRef": "decideSubmit",
+      "waypoints": [
+        {
+          "x": 345.0,
+          "y": 197.0
+        },
+        {
+          "x": 390.0,
+          "y": 197.0
+        }
+      ],
+      "properties": []
+    },
+    {
+      "completed": false,
+      "current": false,
+      "id": "flow4",
+      "type": "sequenceFlow",
+      "sourceRef": "tl_approve",
+      "targetRef": "decideTLApprove",
+      "waypoints": [
+        {
+          "x": 580.0,
+          "y": 197.0
+        },
+        {
+          "x": 625.0,
+          "y": 197.0
+        }
+      ],
+      "properties": []
+    },
+    {
+      "completed": false,
+      "current": false,
+      "id": "flow10",
+      "type": "sequenceFlow",
+      "sourceRef": "decideHRApprove",
+      "targetRef": "submitForm",
+      "waypoints": [
+        {
+          "x": 880.0,
+          "y": 177.0
+        },
+        {
+          "x": 880.0,
+          "y": 133.0
+        },
+        {
+          "x": 292.0,
+          "y": 132.0
+        },
+        {
+          "x": 292.0,
+          "y": 169.0
+        }
+      ],
+      "properties": [
+        {
+          "name": "Condition expression",
+          "value": "${hrApprove == \"n\" || hrApprove == \"N\"}"
+        }
+      ]
+    },
+    {
+      "completed": false,
+      "current": false,
+      "id": "flow9",
+      "type": "sequenceFlow",
+      "sourceRef": "decideTLApprove",
+      "targetRef": "submitForm",
+      "waypoints": [
+        {
+          "x": 645.0,
+          "y": 217.0
+        },
+        {
+          "x": 645.0,
+          "y": 297.0
+        },
+        {
+          "x": 292.0,
+          "y": 296.0
+        },
+        {
+          "x": 292.0,
+          "y": 224.0
+        }
+      ],
+      "properties": [
+        {
+          "name": "Condition expression",
+          "value": "${tlApprove == \"n\" || tlApprove == \"N\"}"
+        }
+      ]
+    },
+    {
+      "completed": false,
+      "current": false,
+      "id": "flow3",
+      "type": "sequenceFlow",
+      "sourceRef": "decideSubmit",
+      "targetRef": "tl_approve",
+      "waypoints": [
+        {
+          "x": 430.0,
+          "y": 197.0
+        },
+        {
+          "x": 475.0,
+          "y": 197.0
+        }
+      ],
+      "properties": [
+        {
+          "name": "Condition expression",
+          "value": "${submitType == \"y\" || submitType == \"Y\"}"
+        }
+      ]
+    },
+    {
+      "completed": false,
+      "current": false,
+      "id": "flow8",
+      "type": "sequenceFlow",
+      "sourceRef": "decideSubmit",
+      "targetRef": "endEventCancel",
+      "waypoints": [
+        {
+          "x": 410.0,
+          "y": 217.0
+        },
+        {
+          "x": 410.0,
+          "y": 266.0
+        },
+        {
+          "x": 510.0,
+          "y": 264.0
+        }
+      ],
+      "properties": [
+        {
+          "name": "Condition expression",
+          "value": "${submitType == \"n\" || submitType == \"N\"}"
+        }
+      ]
+    },
+    {
+      "completed": false,
+      "current": false,
+      "id": "flow6",
+      "type": "sequenceFlow",
+      "sourceRef": "hr_approve",
+      "targetRef": "decideHRApprove",
+      "waypoints": [
+        {
+          "x": 815.0,
+          "y": 197.0
+        },
+        {
+          "x": 860.0,
+          "y": 197.0
+        }
+      ],
+      "properties": []
+    },
+    {
+      "completed": false,
+      "current": false,
+      "id": "flow7",
+      "type": "sequenceFlow",
+      "sourceRef": "decideHRApprove",
+      "targetRef": "endEvent",
+      "waypoints": [
+        {
+          "x": 900.0,
+          "y": 197.0
+        },
+        {
+          "x": 945.0,
+          "y": 197.0
+        }
+      ],
+      "properties": [
+        {
+          "name": "Condition expression",
+          "value": "${hrApprove == \"y\" || hrApprove == \"Y\"}"
+        }
+      ]
+    },
+    {
+      "completed": false,
+      "current": false,
+      "id": "flow5",
+      "type": "sequenceFlow",
+      "sourceRef": "decideTLApprove",
+      "targetRef": "hr_approve",
+      "waypoints": [
+        {
+          "x": 665.0,
+          "y": 197.0
+        },
+        {
+          "x": 710.0,
+          "y": 197.0
+        }
+      ],
+      "properties": [
+        {
+          "name": "Condition expression",
+          "value": "${tlApprove == \"y\" || tlApprove == \"Y\"}"
+        }
+      ]
+    }
+  ],
+  "diagramBeginX": 175.0,
+  "diagramBeginY": 132.0,
+  "diagramWidth": 973.0,
+  "diagramHeight": 297.0,
+  "completedActivities": [
+    "startEvent"
+  ],
+  "currentActivities": [
+    "submitForm"
+  ],
+  "completedSequenceFlows": [
+    "flow1"
+  ]
+}
