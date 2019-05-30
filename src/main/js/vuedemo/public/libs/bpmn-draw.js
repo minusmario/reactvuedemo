@@ -234,7 +234,6 @@ function _drawCallActivity(element)
     _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
 }
 
-// TODO: integrate into diagram-util class
 function _drawScriptTask(element)
 {
 	_drawTask(element);
@@ -242,7 +241,6 @@ function _drawScriptTask(element)
 	_addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
 }
 
-// TODO: integrate into diagram-util class
 function _drawUserTask(element)
 {
 	_drawTask(element);
@@ -250,7 +248,6 @@ function _drawUserTask(element)
 	_addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
 }
 
-// TODO: integrate into diagram-util class
 function _drawBusinessRuleTask(element)
 {
 	_drawTask(element);
@@ -258,7 +255,6 @@ function _drawBusinessRuleTask(element)
 	_addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
 }
 
-// TODO: integrate into diagram-util class
 function _drawManualTask(element)
 {
 	_drawTask(element);
@@ -266,7 +262,6 @@ function _drawManualTask(element)
 	_addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
 }
 
-// TODO: integrate into diagram-util class
 function _drawSendTask(element)
 {
     _drawTask(element);
@@ -274,7 +269,6 @@ function _drawSendTask(element)
     _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
 }
 
-// TODO: integrate into diagram-util class
 function _drawReceiveTask(element)
 {
 	_drawTask(element);
