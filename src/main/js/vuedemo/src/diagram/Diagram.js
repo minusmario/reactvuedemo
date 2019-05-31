@@ -3,7 +3,7 @@ import Anchor from './Anchor';
 import ANCHOR_TYPE from './Anchor-type';
 
 export default class Diagram {
-  constructor(domId, paper) {
+  constructor(domId, paper, canvasWidth, canvasHeight) {
     this.domId = domId;
     this.paper = paper;
     this.CURRENT_COLOR = '#017501';
@@ -24,9 +24,11 @@ export default class Diagram {
     this.TASK_STROKE = 1;
     this.TASK_HIGHLIGHT_STROKE = 2;
     this.customActivityColors = {};
-    this.customActivityToolTips = {};
+    this.customActivityToolTips = undefined;
     this.elementsAdded = [];
     this.elementsRemoved = [];
+    this.canvasWidth = canvasWidth;
+    this.canvasHeight = canvasHeight;
     Polyline.prototype = {
       id: null,
       points: [],
@@ -40,7 +42,7 @@ export default class Diagram {
       isDefaultConditionAvailable: false,
       closePath: false,
 
-      init: function (points) {
+      init: function () {
         const linesCount = this.getLinesCount();
         if (linesCount < 1)
           return;
@@ -1164,7 +1166,7 @@ export default class Diagram {
     }
     // Default tooltip, no custom tool tip set
     if (documentation === undefined) {
-      let documentation = '';
+      documentation = '';
       if (element.name && element.name.length > 0) {
         documentation += '<b>Name</b>: <i>' + element.name + '</i><br/><br/>';
       }
@@ -1175,7 +1177,7 @@ export default class Diagram {
           if (element.properties[i].type && element.properties[i].type ===
             'list') {
             documentation += '<b>' + propName + '</b>:<br/>';
-            for (var j = 0; j < element.properties[i].value.length; j++) {
+            for (let j = 0; j < element.properties[i].value.length; j++) {
               documentation += '<i>' + element.properties[i].value[j] +
                 '</i><br/>';
             }
@@ -1261,20 +1263,19 @@ export default class Diagram {
   }
 
   _zoom(zoomIn) {
-    debugger;
     let tmpCanvasWidth, tmpCanvasHeight;
     if (zoomIn) {
-      tmpCanvasWidth = canvasWidth * (1.0 / 0.90);
-      tmpCanvasHeight = canvasHeight * (1.0 / 0.90);
+      tmpCanvasWidth = this.canvasWidth * (1.0 / 0.90);
+      tmpCanvasHeight = this.canvasHeight * (1.0 / 0.90);
     } else {
-      tmpCanvasWidth = canvasWidth * (1.0 / 1.10);
-      tmpCanvasHeight = canvasHeight * (1.0 / 1.10);
+      tmpCanvasWidth = this.canvasWidth * (1.0 / 1.10);
+      tmpCanvasHeight = this.canvasHeight * (1.0 / 1.10);
     }
 
-    if (tmpCanvasWidth !== canvasWidth || tmpCanvasHeight !== canvasHeight) {
-      canvasWidth = tmpCanvasWidth;
-      canvasHeight = tmpCanvasHeight;
-      this.paper.setSize(canvasWidth, canvasHeight);
+    if (tmpCanvasWidth !== this.canvasWidth || tmpCanvasHeight !== this.canvasHeight) {
+      this.canvasWidth = tmpCanvasWidth;
+      this.canvasHeight = tmpCanvasHeight;
+      this.paper.setSize(this.canvasWidth, this.canvasHeight);
     }
   }
 }

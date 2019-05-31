@@ -46,7 +46,7 @@
             canvasHeight);
           paper.setViewBox(0, 0, viewBoxWidth, viewBoxHeight, false);
           paper.renderfix();
-          const diagram = new Diagram(domId, paper);
+          const diagram = new Diagram(domId, paper, canvasWidth, canvasHeight);
           if (data.pools) {
             for (let i = 0; i < data.pools.length; i++) {
               const pool = data.pools[i];
