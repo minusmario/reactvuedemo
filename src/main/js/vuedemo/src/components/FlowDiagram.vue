@@ -1,25 +1,20 @@
 <template>
-    <div :id='id'></div>
+    <div :id='flowId'></div>
 </template>
 
 <script>
   import Diagram from '../diagram/Diagram';
 
-  import '../diagram/Anchor';
-  import '../diagram/Polyline';
-  import '../diagram/Polygone';
-  import '../diagram/Foo';
-
   export default {
     name: 'FlowDiagram',
     props: {
       flowData: Object,
-      id: String,
+      flowId: String,
     },
     watch: {
       'flowData': function (data) {
         if (data.elements) {
-          const domId = '#' + this.id;
+          const domId = '#' + this.flowId;
           if ((!data.elements || data.elements.length === 0) &&
             (!data.pools || data.pools.length === 0)) return;
           let INITIAL_CANVAS_WIDTH = data.diagramWidth;
@@ -47,7 +42,7 @@
           }
           $(domId).width(INITIAL_CANVAS_WIDTH);
           $(domId).height(INITIAL_CANVAS_HEIGHT);
-          const paper = Raphael(document.getElementById(this.id), canvasWidth,
+          const paper = Raphael(document.getElementById(this.flowId), canvasWidth,
             canvasHeight);
           paper.setViewBox(0, 0, viewBoxWidth, viewBoxHeight, false);
           paper.renderfix();

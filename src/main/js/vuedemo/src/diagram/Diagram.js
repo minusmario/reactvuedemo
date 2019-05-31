@@ -1,3 +1,7 @@
+import Polyline from './Polyline';
+import Anchor from './Anchor';
+import ANCHOR_TYPE from './Anchor-type';
+
 export default class Diagram {
   constructor(domId, paper) {
     this.domId = domId;
@@ -21,6 +25,262 @@ export default class Diagram {
     this.TASK_HIGHLIGHT_STROKE = 2;
     this.customActivityColors = {};
     this.customActivityToolTips = {};
+    this.elementsAdded = [];
+    this.elementsRemoved = [];
+    Polyline.prototype = {
+      id: null,
+      points: [],
+      path: [],
+      anchors: [],
+      strokeWidth: 1,
+      radius: 1,
+      showDetails: false,
+      paper: null,
+      element: null,
+      isDefaultConditionAvailable: false,
+      closePath: false,
+
+      init: function (points) {
+        const linesCount = this.getLinesCount();
+        if (linesCount < 1)
+          return;
+        this.normalizeCoordinates();
+        // create anchors
+        this.pushAnchor(ANCHOR_TYPE.first, this.getLine(0).x1,
+          this.getLine(0).y1);
+        for (let i = 1; i < linesCount; i++) {
+          const line1 = this.getLine(i - 1);
+          this.pushAnchor(ANCHOR_TYPE.main, line1.x2, line1.y2);
+        }
+        this.pushAnchor(ANCHOR_TYPE.last, this.getLine(linesCount - 1).x2,
+          this.getLine(linesCount - 1).y2);
+        this.rebuildPath();
+      },
+
+      normalizeCoordinates: function () {
+        for (let i = 0; i < this.points.length; i++) {
+          this.points[i].x = parseFloat(this.points[i].x);
+          this.points[i].y = parseFloat(this.points[i].y);
+        }
+      },
+
+      getLinesCount: function () {
+        return this.points.length - 1;
+      },
+      _getLine: function (i) {
+        if (this.points.length > i && this.points[i]) {
+          return {
+            x1: this.points[i].x,
+            y1: this.points[i].y,
+            x2: this.points[i + 1].x,
+            y2: this.points[i + 1].y,
+          };
+        } else {
+          return undefined;
+        }
+      },
+      getLine: function (i) {
+        const line = this._getLine(i);
+        if (line !== undefined) {
+          line.angle = this.getLineAngle(i);
+        }
+        return line;
+      },
+      getLineAngle: function (i) {
+        const line = this._getLine(i);
+        return Math.atan2(line.y2 - line.y1, line.x2 - line.x1);
+      },
+      getLineLengthX: function (i) {
+        const line = this.getLine(i);
+        return (line.x2 - line.x1);
+      },
+      getLineLengthY: function (i) {
+        const line = this.getLine(i);
+        return (line.y2 - line.y1);
+      },
+      getLineLength: function (i) {
+        return Math.sqrt(Math.pow(this.getLineLengthX(i), 2) +
+          Math.pow(this.getLineLengthY(i), 2));
+      },
+
+      getAnchors: function () {
+        return this.anchors;
+      },
+      getAnchorsCount: function (type) {
+        if (!type)
+          return this.anchors.length;
+        else {
+          let count = 0;
+          for (let i = 0; i < this.getAnchorsCount(); i++) {
+            const anchor = this.anchors[i];
+            if (anchor.getType() === type) {
+              count++;
+            }
+          }
+          return count;
+        }
+      },
+
+      pushAnchor: function (type, x, y, index) {
+        let typeIndex;
+        if (type === ANCHOR_TYPE.first) {
+          index = 0;
+          typeIndex = 0;
+        } else if (type === ANCHOR_TYPE.last) {
+          index = this.getAnchorsCount();
+          typeIndex = 0;
+        } else if (!index) {
+          index = this.anchors.length;
+        } else {
+          for (let i = 0; i < this.getAnchorsCount(); i++) {
+            const anchor = this.anchors[i];
+            if (anchor.index > index) {
+              anchor.index++;
+              anchor.typeIndex++;
+            }
+          }
+        }
+        const anchor = new Anchor(this.id, ANCHOR_TYPE.main, x, y, index,
+          typeIndex);
+        Anchor.prototype = {
+          uuid: null,
+          x: 0,
+          y: 0,
+          type: ANCHOR_TYPE.main,
+          isFirst: false,
+          isLast: false,
+          index: 0,
+          typeIndex: 0,
+        };
+        this.anchors.push(anchor);
+      },
+
+      getAnchor: function (position) {
+        return this.anchors[position];
+      },
+
+      getAnchorByType: function (type, position) {
+        if (type === ANCHOR_TYPE.first)
+          return this.anchors[0];
+        if (type === ANCHOR_TYPE.last)
+          return this.anchors[this.getAnchorsCount() - 1];
+
+        for (let i = 0; i < this.getAnchorsCount(); i++) {
+          const anchor = this.anchors[i];
+          if (anchor.type === type) {
+            if (position === anchor.position)
+              return anchor;
+          }
+        }
+        return null;
+      },
+
+      addNewPoint: function (position, x, y) {
+        for (let i = 0; i < this.getLinesCount(); i++) {
+          const line = this.getLine(i);
+          if (x > line.x1 && x < line.x2 && y > line.y1 && y < line.y2) {
+            this.points.splice(i + 1, 0, { x: x, y: y });
+            break;
+          }
+        }
+        this.rebuildPath();
+      },
+
+      rebuildPath: function () {
+        const path = [];
+
+        for (let i = 0; i < this.getAnchorsCount(); i++) {
+          const anchor = this.getAnchor(i);
+          let pathType = '';
+          if (i === 0)
+            pathType = 'M';
+          else
+            pathType = 'L';
+          // TODO: save previous points and calculate new path just if points are updated, and then save currents values as previous
+          let targetX = anchor.x, targetY = anchor.y;
+          let dx0, dy0, ax, ay, dx1, dy1, bx, by, zx, zy;
+          if (i > 0 && i < this.getAnchorsCount() - 1) {
+            // get new x,y
+            const cx = anchor.x, cy = anchor.y;
+
+            // pivot point of prev line
+            let AO = this.getLineLength(i - 1);
+            if (AO < this.radius) {
+              AO = this.radius;
+            }
+
+            this.isDefaultConditionAvailable = (this.isDefaultConditionAvailable ||
+              (i === 1 && AO > 10));
+
+            let ED = this.getLineLengthY(i - 1) * this.radius / AO;
+            let OD = this.getLineLengthX(i - 1) * this.radius / AO;
+            targetX = anchor.x - OD;
+            targetY = anchor.y - ED;
+            if (AO < 2 * this.radius && i > 1) {
+              targetX = anchor.x - this.getLineLengthX(i - 1) / 2;
+              targetY = anchor.y - this.getLineLengthY(i - 1) / 2;
+            }
+            // pivot point of next line
+            AO = this.getLineLength(i);
+            if (AO < this.radius) {
+              AO = this.radius;
+            }
+            ED = this.getLineLengthY(i) * this.radius / AO;
+            OD = this.getLineLengthX(i) * this.radius / AO;
+            let nextSrcX = anchor.x + OD;
+            let nextSrcY = anchor.y + ED;
+
+            if (AO < 2 * this.radius && i < this.getAnchorsCount() - 2) {
+              nextSrcX = anchor.x + this.getLineLengthX(i) / 2;
+              nextSrcY = anchor.y + this.getLineLengthY(i) / 2;
+            }
+            dx0 = (cx - targetX) / 3;
+            dy0 = (cy - targetY) / 3;
+            ax = cx - dx0;
+            ay = cy - dy0;
+            dx1 = (cx - nextSrcX) / 3;
+            dy1 = (cy - nextSrcY) / 3;
+            bx = cx - dx1;
+            by = cy - dy1;
+            zx = nextSrcX;
+            zy = nextSrcY;
+          } else if (i === 1 && this.getAnchorsCount() === 2) {
+            let AO = this.getLineLength(i - 1);
+            if (AO < this.radius) {
+              AO = this.radius;
+            }
+            this.isDefaultConditionAvailable = (this.isDefaultConditionAvailable ||
+              (i === 1 && AO > 10));
+          }
+
+          // anti smoothing
+          if (this.strokeWidth % 2 === 1) {
+            targetX += 0.5;
+            targetY += 0.5;
+          }
+
+          path.push([pathType, targetX, targetY]);
+
+          if (i > 0 && i < this.getAnchorsCount() - 1) {
+            path.push(['C', ax, ay, bx, by, zx, zy]);
+          }
+        }
+
+        if (this.closePath) {
+          path.push(['Z']);
+        }
+
+        this.path = path;
+      },
+
+      transform: function (transformation) {
+        this.element.transform(transformation);
+      },
+      attr: function (attrs) {
+        // TODO: foreach and set each
+        this.element.attr(attrs);
+      },
+    };
   }
 
   _getColor(element, defaultColor) {
@@ -179,7 +439,7 @@ export default class Diagram {
         '../service/stencilitem/' + element.stencilIconId + '/icon',
         element.x + 4, element.y + 4, 16, 16);
     } else {
-      this._drawServiceTaskIcon(lement.x + 4, element.y + 4);
+      this._drawServiceTaskIcon(element.x + 4, element.y + 4);
     }
     this._addHoverLogic(element, 'rect', this.ACTIVITY_STROKE_COLOR);
   }
@@ -195,7 +455,7 @@ export default class Diagram {
     // Opacity
     const callActivityOpacity = this.CUSTOM_OPACITY;
     rect.attr({
-      'stroke-width': CALL_ACTIVITY_STROKE,
+      'stroke-width': this.CALL_ACTIVITY_STROKE,
       'stroke': strokeColor,
       'fill': callActivityFillColor,
       'fill-opacity': callActivityOpacity,
@@ -257,7 +517,7 @@ export default class Diagram {
     }
     const width = element.width - (strokeWidth / 2);
     const height = element.height - (strokeWidth / 2);
-    const rect = paper.rect(element.x, element.y, width, height, 4);
+    const rect = this.paper.rect(element.x, element.y, width, height, 4);
     rectAttrs['stroke-width'] = strokeWidth;
     // Fill
     rectAttrs['fill'] = this._determineCustomFillColor(element,
@@ -976,11 +1236,11 @@ export default class Diagram {
     }
     let opacity = 0;
     let fillColor = '#ffffff';
-    if ($.inArray(element.id, elementsAdded) >= 0) {
+    if ($.inArray(element.id, this.elementsAdded) >= 0) {
       opacity = 0.2;
       fillColor = 'green';
     }
-    if ($.inArray(element.id, elementsRemoved) >= 0) {
+    if ($.inArray(element.id, this.elementsRemoved) >= 0) {
       opacity = 0.2;
       fillColor = 'red';
     }
@@ -1001,6 +1261,7 @@ export default class Diagram {
   }
 
   _zoom(zoomIn) {
+    debugger;
     let tmpCanvasWidth, tmpCanvasHeight;
     if (zoomIn) {
       tmpCanvasWidth = canvasWidth * (1.0 / 0.90);

@@ -1,6 +1,6 @@
 <template>
     <div class="home">
-        <flow-diagram :flow-data='flowData'></flow-diagram>
+        <flow-diagram :flow-data='flowData' flow-id='diagram-1111'></flow-diagram>
     </div>
 </template>
 
