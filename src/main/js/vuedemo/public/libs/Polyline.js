@@ -16,7 +16,7 @@
  *
  * @author Dmitry Farafonov
  */
- 
+
 var ANCHOR_TYPE= {
 	main: "main",
 	middle: "middle",
@@ -25,7 +25,7 @@ var ANCHOR_TYPE= {
 };
 
 function Anchor(uuid, type, x, y) {
-	this.uuid = uuid; 
+	this.uuid = uuid;
 	this.x = x;
 	this.y = y;
 	this.type = (type == ANCHOR_TYPE.middle) ? ANCHOR_TYPE.middle : ANCHOR_TYPE.main;
@@ -37,7 +37,7 @@ Anchor.prototype = {
 	type: ANCHOR_TYPE.main,
 	isFirst: false,
 	isLast: false,
-	ndex: 0,
+	index: 0,
 	typeIndex: 0
 };
 
@@ -50,21 +50,21 @@ function Polyline(uuid, points, strokeWidth, paper) {
 	 *			{x: 650, y: 370}];      4
 	 */
 	this.points = points;
-	
+
 	/*
 	 * path for graph
 	 * [["M", x1, y1], ["L", x2, y2], ["C", ax, ay, bx, by, x3, y3], ["L", x3, y3]]
 	 */
 	this.path = [];
-	
+
 	this.anchors = [];
-	
+
 	if (strokeWidth) this.strokeWidth = strokeWidth;
-	
+
 	this.paper = paper;
-	
+
 	this.closePath = false;
-	
+
 	this.init();
 };
 
@@ -80,36 +80,36 @@ Polyline.prototype = {
 	element: null,
 	isDefaultConditionAvailable: false,
 	closePath: false,
-	
+
 	init: function(points){
 		var linesCount = this.getLinesCount();
 		if (linesCount < 1)
 			return;
-			
+
 		this.normalizeCoordinates();
-		
+
 		// create anchors
-		
+
 		this.pushAnchor(ANCHOR_TYPE.first, this.getLine(0).x1, this.getLine(0).y1);
-		
+
 		for (var i = 1; i < linesCount; i++)
 		{
 			var line1 = this.getLine(i-1);
 			this.pushAnchor(ANCHOR_TYPE.main,  line1.x2, line1.y2);
 		}
-		
+
 		this.pushAnchor(ANCHOR_TYPE.last, this.getLine(linesCount-1).x2, this.getLine(linesCount-1).y2);
-		
+
 		this.rebuildPath();
 	},
-	
+
 	normalizeCoordinates: function(){
 		for(var i=0; i < this.points.length; i++){
 			this.points[i].x = parseFloat(this.points[i].x);
 			this.points[i].y = parseFloat(this.points[i].y);
 		}
 	},
-	
+
 	getLinesCount: function(){
 		return this.points.length-1;
 	},
@@ -142,7 +142,7 @@ Polyline.prototype = {
 	getLineLength: function(i){
 		return Math.sqrt(Math.pow(this.getLineLengthX(i), 2) + Math.pow(this.getLineLengthY(i), 2));
 	},
-	
+
 	getAnchors: function(){
 		return this.anchors;
 	},
@@ -160,7 +160,7 @@ Polyline.prototype = {
 			return count;
 		}
 	},
-	
+
 	pushAnchor: function(type, x, y, index){
 		if (type == ANCHOR_TYPE.first) {
 			index = 0;
@@ -179,22 +179,22 @@ Polyline.prototype = {
 				}
 			}
 		}
-		
+
 		var anchor = new Anchor(this.id, ANCHOR_TYPE.main, x, y, index, typeIndex);
-		
+
 		this.anchors.push(anchor);
 	},
-	
+
 	getAnchor: function(position){
 		return this.anchors[position];
 	},
-	
+
 	getAnchorByType: function(type, position){
 		if (type == ANCHOR_TYPE.first)
 			return this.anchors[0];
 		if (type == ANCHOR_TYPE.last)
 			return this.anchors[this.getAnchorsCount()-1];
-		
+
 		for(var i=0; i < this.getAnchorsCount(); i++){
 			var anchor = this.anchors[i];
 			if (anchor.type == type) {
@@ -204,9 +204,9 @@ Polyline.prototype = {
 		}
 		return null;
 	},
-	
+
 	addNewPoint: function(position, x, y){
-		// 
+		//
 		for(var i = 0; i < this.getLinesCount(); i++){
 			var line = this.getLine(i);
 			if (x > line.x1 && x < line.x2 && y > line.y1 && y < line.y2) {
@@ -214,47 +214,47 @@ Polyline.prototype = {
 				break;
 			}
 		}
-		
+
 		this.rebuildPath();
 	},
-	
+
 	rebuildPath: function(){
 		var path = [];
-		
+
 		for(var i = 0; i < this.getAnchorsCount(); i++){
 			var anchor = this.getAnchor(i);
-			
+
 			var pathType = "";
 			if (i == 0)
 				pathType = "M";
-			else 
+			else
 				pathType = "L";
-			
+
 			// TODO: save previous points and calculate new path just if points are updated, and then save currents values as previous
-			
+
 			var targetX = anchor.x, targetY = anchor.y;
 			if (i>0 && i < this.getAnchorsCount()-1) {
 				// get new x,y
 				var cx = anchor.x, cy = anchor.y;
-				
+
 				// pivot point of prev line
 				var AO = this.getLineLength(i-1);
 				if (AO < this.radius) {
 					AO = this.radius;
 				}
-				
+
 				this.isDefaultConditionAvailable = (this.isDefaultConditionAvailable || (i == 1 && AO > 10));
-				
+
 				var ED = this.getLineLengthY(i-1) * this.radius / AO;
 				var OD = this.getLineLengthX(i-1) * this.radius / AO;
 					targetX = anchor.x - OD;
 					targetY = anchor.y - ED;
-				
+
 				if (AO < 2*this.radius && i>1) {
 					targetX = anchor.x - this.getLineLengthX(i-1)/2;
 					targetY = anchor.y - this.getLineLengthY(i-1)/2;;
 				}
-					
+
 				// pivot point of next line
 				var AO = this.getLineLength(i);
 				if (AO < this.radius) {
@@ -264,25 +264,25 @@ Polyline.prototype = {
 				var OD = this.getLineLengthX(i) * this.radius / AO;
 					var nextSrcX = anchor.x + OD;
 					var nextSrcY = anchor.y + ED;
-					
+
 				if (AO < 2*this.radius && i<this.getAnchorsCount()-2) {
 					nextSrcX = anchor.x + this.getLineLengthX(i)/2;
 					nextSrcY = anchor.y + this.getLineLengthY(i)/2;;
 				}
-					
-				
+
+
 				var dx0 = (cx - targetX) / 3,
 					dy0 = (cy - targetY) / 3,
 					ax = cx - dx0,
 					ay = cy - dy0,
-					
+
 					dx1 = (cx - nextSrcX) / 3,
 					dy1 = (cy - nextSrcY) / 3,
 					bx = cx - dx1,
 					by = cy - dy1,
-					
+
 					zx=nextSrcX, zy=nextSrcY;
-					
+
 			} else if (i==1 && this.getAnchorsCount() == 2){
 				var AO = this.getLineLength(i-1);
 				if (AO < this.radius) {
@@ -296,22 +296,22 @@ Polyline.prototype = {
 				targetX += 0.5;
 				targetY += 0.5;
 			}
-			
+
 			path.push([pathType, targetX, targetY]);
-			
+
 			if (i>0 && i < this.getAnchorsCount()-1) {
 				path.push(["C", ax, ay, bx, by, zx, zy]);
 			}
 		}
-		
-		if (this.closePath) 
+
+		if (this.closePath)
 		{
 			path.push(["Z"]);
 		}
-		
+
 		this.path = path;
 	},
-	
+
 	transform: function(transformation)
 	{
 		this.element.transform(transformation);
@@ -332,17 +332,17 @@ function Polygone(points, strokeWidth) {
 	 *			{x: 650, y: 370}];      4
 	 */
 	this.points = points;
-	
+
 	/*
 	 * path for graph
 	 * [["M", x1, y1], ["L", x2, y2], ["C", ax, ay, bx, by, x3, y3], ["L", x3, y3]]
 	 */
 	this.path = [];
-	
+
 	this.anchors = [];
-	
+
 	if (strokeWidth) this.strokeWidth = strokeWidth;
-	
+
 	this.closePath = true;
 	this.init();
 };
@@ -361,25 +361,25 @@ Polygone.prototype.rebuildPath = function(){
 	var path = [];
 	for(var i = 0; i < this.getAnchorsCount(); i++){
 		var anchor = this.getAnchor(i);
-		
+
 		var pathType = "";
 		if (i == 0)
 			pathType = "M";
-		else 
+		else
 			pathType = "L";
-		
+
 		var targetX = anchor.x, targetY = anchor.y;
-		
+
 		// anti smoothing
 		if (this.strokeWidth%2 == 1) {
 			targetX += 0.5;
 			targetY += 0.5;
 		}
-		
-		path.push([pathType, targetX, targetY]);	
+
+		path.push([pathType, targetX, targetY]);
 	}
 	if (this.closePath)
 		path.push(["Z"]);
-	
+
 	this.path = path;
 };
